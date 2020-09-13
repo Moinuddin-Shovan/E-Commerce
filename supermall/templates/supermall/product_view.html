@@ -1,0 +1,24 @@
+{% extends 'supermall/basic.html' %}
+
+{% block title%} {{product.product_name}} -- Happy Shopping {% endblock %}
+{% block body %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="row">
+               <img src="/media/{{product.image}}" width="300px" height="285px" style="border:2px solid black">
+            </div>
+
+            <div class="row">
+                <button class="btn btn-success mx-4 my-3 ">Buy Now</button>
+                <button class="btn btn-dark my-3">Add To Cart</button>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h5>{{product.product_name}}</h5>
+            <p>{{product.description}}</p>
+            <p><b>BDT: {{product.price}}</b></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

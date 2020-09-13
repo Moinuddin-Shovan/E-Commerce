@@ -1,0 +1,112 @@
+{% extends 'supermall/basic.html' %}
+
+{% block title%} Checkout - Dubaiwala{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="col mt-4 mb-4">
+        <h4>Step 1 - Dubaiwala Express Checkout - Review Your Cart Items</h4>
+        <div id="items">
+            <ul class="list-group">
+            </ul>
+        </div>
+        <div class="p-2 mt-4 d-flex justify-content-end bg-dark text-white">
+            <h4>Total amount(in Taka): <span class="badge badge-warning text-right" id="totalPrice"></span></h4>
+        </div>
+
+
+
+    </div>
+    <div class="col my-4">
+        <h4 >Step 2 - Enter Address & Other Details:</h4>
+        <form method="post" action="/supermall/checkout/">
+            {% csrf_token %}
+            <input type="hidden" name="itemsJson" id="itemsJson">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+                </div>
+                <div class="form-group col-md-6" >
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address1">Address</label>
+                <input type="text" class="form-control" id="address1" name="address1" placeholder="1234 Main St" required>
+            </div>
+            <div class="form-group">
+                <label for="address2">Address line 2</label>
+                <input type="text" class="form-control" id="address2" name="address2" placeholder="Apartment, studio, or floor">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control" id="city" name="city" placeholder="Chittagong" required>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="postal_code">Zip or Postal Code</label>
+                    <input type="text" class="form-control"  name="postal_code" placeholder="4387" id="postal_code">
+                </div>
+            </div>
+            <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="018 XX-XX XX XX" required>
+                </div>
+            <button type="submit" class="btn btn-success">Place Order</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+if (localStorage.getItem('cart') == null) {
+    var cart = {};
+} else {
+    cart = JSON.parse(localStorage.getItem('cart'));
+}
+console.log(cart);
+var sum = 0;
+var totalPrice = 0;
+let i = 1;
+if ($.isEmptyObject(cart)) {
+    //if object is empty
+    mystr = `<h5><marquee scrollamount="12"><center>Your cart is empty, please add some items to your cart before checking out!</center></marquee></h5>`
+    $('#items').append(mystr);
+} else {
+    for (item in cart) {
+        let qty = cart[item][0];
+        let name = cart[item][1];
+        let indivprice = cart[item][2];
+        let price = indivprice*qty;
+        totalPrice = totalPrice + price;
+        sum = sum + qty;
+
+        if( qty > 0) {
+        mystr = `<li class="list-group-item d-flex ">
+                    <div class="p-2"><b> ${i}. ${name}</b> </div>
+                    <div class="p-2"><b><span class="badge badge-primary">${indivprice}</span> (x${qty})</b></div>
+                    <div class="ml-auto p-2"><b><span class="badge badge-warning">${price}</span></b></div>
+                </li>`
+        $('#items').append(mystr);
+        i = i+1;
+        }
+        else
+         {
+            delete cart[item];
+         }
+    }
+}
+document.getElementById('cart').innerHTML = sum;
+document.getElementById('totalPrice').innerHTML = totalPrice;
+
+$('#itemsJson').val(JSON.stringify(cart));
+{% if thank %}
+alert('Thanks for ordering with us. Your order is {{id}}. Use it to track your order using our order tracker');
+localStorage.clear();
+document.location = "/supermall";
+{% endif %}
+</script>
+{% endblock %}
+
